@@ -1,13 +1,13 @@
-# def generate_groups(groups, year):
-#     res = []
-#     for spec, num in groups.items():
-#         res.extend([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
-#     return res
-#
-#
-# groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
-# year = 21
-# print(generate_groups(groups, year))
+def generate_groups(groups, year):
+    res = []
+    for spec, num in groups.items():
+        res.extend([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
+    return res
+
+
+groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
+year = 21
+print(generate_groups(groups, year))
 #
 #
 #
