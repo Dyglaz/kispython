@@ -1,16 +1,32 @@
-def generate_groups(groups, year):
-    res = []
-    for spec, num in groups.items():
-        res.extend([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
-    return res
+    def generate_groups(groups, year):
+        res = {}
+        for spec, num in groups.items():
+            res[spec] = ([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
+        return res
 
 
-groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
-year = 21
-print(generate_groups(groups, year))
+    def gen_view(groups_dict):
+        for spec, groups in groups_dict.items():
+            print(spec)
+            for i in range(len(groups) // 10 + 1):
+                print(*groups[i * 10:(i + 1) * 10])
+                print()
+
+
+    groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
+    year = 21
+    groups_d = generate_groups(groups, year)
+    gen_view(groups_d)
+
+
+
+
+
+
+
+        #
 #
-#
-#
+
 # import sys
 #
 # def my_print(*objects , sep=' ', end='\n', file=sys.stdout, flush=False):
@@ -58,6 +74,8 @@ print(generate_groups(groups, year))
 #
 # for i in encrypted_message:
 #     print(chr(i), end='')
+
+
 
 
 
