@@ -1,22 +1,22 @@
-    def generate_groups(groups, year):
-        res = {}
-        for spec, num in groups.items():
-            res[spec] = ([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
-        return res
-
-
-    def gen_view(groups_dict):
-        for spec, groups in groups_dict.items():
-            print(spec)
-            for i in range(len(groups) // 10 + 1):
-                print(*groups[i * 10:(i + 1) * 10])
-                print()
-
-
-    groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
-    year = 21
-    groups_d = generate_groups(groups, year)
-    gen_view(groups_d)
+    # def generate_groups(groups, year):
+    #     res = {}
+    #     for spec, num in groups.items():
+    #         res[spec] = ([f'{spec}-{i:02}-{year}' for i in range(1, num+1)])
+    #     return res
+    #
+    #
+    # def gen_view(groups_dict):
+    #     for spec, groups in groups_dict.items():
+    #         print(spec)
+    #         for i in range(len(groups) // 10 + 1):
+    #             print(*groups[i * 10:(i + 1) * 10])
+    #             print()
+    #
+    #
+    # groups = {'ИВБО': 8, 'ИКБО': 33, 'ИМБО': 2, 'ИНБО': 13}
+    # year = 21
+    # groups_d = generate_groups(groups, year)
+    # gen_view(groups_d)
 
 
 
@@ -75,8 +75,104 @@
 # for i in encrypted_message:
 #     print(chr(i), end='')
 
+# def main(inp):
+#     table = []
+#     for i in inp:
+#         if i not in table:
+#             table.append(i)
+#     res = []
+#     for i in range(len(table)):
+#         line = table[i]
+#         mail = line[0].split('[at]')[1]
+#         num, date = line[1].split('#')
+#         num = num.split()[1].replace('-', '')
+#         date = date.replace('-', '.')
+#         date = date[:-4] + date[-2:]
+#         res.append([mail, num, date, line[2].split()[0]])
+#     return res
+#
+# print(main([('gusak68[at]mail.ru', '630 082-0115#20-10-2002', 'Гушак В.Ч.', 'gusak68[at]mail.ru'),
+#             ('tolizli68[at]mail.ru', '582 287-5807#25-04-2003', 'Толизли К.Г.', 'tolizli68[at]mail.ru'),
+#             ('benic93[at]yahoo.com', '748 017-3777#18-06-2001', 'Бенич И.О.', 'benic93[at]yahoo.com'),
+#             ('lulanz92[at]mail.ru', '387 959-0489#10-04-2002', 'Лулянц Г.Ш.', 'lulanz92[at]mail.ru'),
+#             ('lulanz92[at]mail.ru', '387 959-0489#10-04-2002', 'Лулянц Г.Ш.', 'lulanz92[at]mail.ru')]))
+#
 
 
+class StateMachine:
+    def __init__(self):
+        self.state = "A"
+
+    def sway(self):
+        if self.state == "A":
+            self.state = "B"
+            return 0
+        if self.state == "B":
+            self.state = "C"
+            return 1
+        if self.state == "C":
+            return 4
+        if self.state == "D":
+            self.state = "E"
+            return 5
+        if self.state == "E":
+            self.state = "F"
+            return 6
+        if self.state == "F":
+            self.state = "G"
+            return 8
+        raise MealyError("sway")
+
+    def pull(self):
+        if self.state == "B":
+            self.state = "G"
+            return 2
+        if self.state == "C":
+            self.state = "D"
+            return 3
+        if self.state == "E":
+            self.state = "C"
+            return 7
+        if self.state == "G":
+            self.state = "D"
+            return 9
+        raise MealyError("pull")
 
 
+class MealyError(Exception):
+    pass
 
+
+def main():
+    return StateMachine()
+
+
+def raises(method, error):
+    output = None
+    try:
+        output = method()
+    except Exception as e:
+        assert type(e) == error
+    assert output is None
+
+
+def test():
+    o = main()
+    assert o.sway() == 0
+    assert o.sway() == 1
+    assert o.sway() == 4
+    assert o.pull() == 3
+    assert o.sway() == 5
+    assert o.sway() == 6
+    assert o.sway() == 8
+    assert o.pull() == 9
+    assert o.sway() == 5
+    assert o.pull() == 7
+    o = main()
+    assert o.sway() == 0
+    assert o.pull() == 2
+    o = main()
+    raises(lambda: o.pull(), MealyError)
+    assert o.sway() == 0
+    assert o.pull() == 2
+    raises(lambda: o.sway(), MealyError)
