@@ -99,80 +99,201 @@
 #
 
 
-class StateMachine:
-    def __init__(self):
-        self.state = "A"
+# class StateMachine:
+#     def __init__(self):
+#         self.state = "A"
+#
+#     def sway(self):
+#         if self.state == "A":
+#             self.state = "B"
+#             return 0
+#         if self.state == "B":
+#             self.state = "C"
+#             return 1
+#         if self.state == "C":
+#             return 4
+#         if self.state == "D":
+#             self.state = "E"
+#             return 5
+#         if self.state == "E":
+#             self.state = "F"
+#             return 6
+#         if self.state == "F":
+#             self.state = "G"
+#             return 8
+#         raise MealyError("sway")
+#
+#     def pull(self):
+#         if self.state == "B":
+#             self.state = "G"
+#             return 2
+#         if self.state == "C":
+#             self.state = "D"
+#             return 3
+#         if self.state == "E":
+#             self.state = "C"
+#             return 7
+#         if self.state == "G":
+#             self.state = "D"
+#             return 9
+#         raise MealyError("pull")
+#
+#
+# class MealyError(Exception):
+#     pass
+#
+#
+# def main():
+#     return StateMachine()
+#
+#
+# def raises(method, error):
+#     output = None
+#     try:
+#         output = method()
+#     except Exception as e:
+#         assert type(e) == error
+#     assert output is None
+#
+#
+# def test():
+#     o = main()
+#     assert o.sway() == 0
+#     assert o.sway() == 1
+#     assert o.sway() == 4
+#     assert o.pull() == 3
+#     assert o.sway() == 5
+#     assert o.sway() == 6
+#     assert o.sway() == 8
+#     assert o.pull() == 9
+#     assert o.sway() == 5
+#     assert o.pull() == 7
+#     o = main()
+#     assert o.sway() == 0
+#     assert o.pull() == 2
+#     o = main()
+#     raises(lambda: o.pull(), MealyError)
+#     assert o.sway() == 0
+#     assert o.pull() == 2
+#     raises(lambda: o.sway(), MealyError)
 
-    def sway(self):
-        if self.state == "A":
-            self.state = "B"
-            return 0
-        if self.state == "B":
-            self.state = "C"
-            return 1
-        if self.state == "C":
-            return 4
-        if self.state == "D":
-            self.state = "E"
-            return 5
-        if self.state == "E":
-            self.state = "F"
-            return 6
-        if self.state == "F":
-            self.state = "G"
-            return 8
-        raise MealyError("sway")
 
-    def pull(self):
-        if self.state == "B":
-            self.state = "G"
-            return 2
-        if self.state == "C":
-            self.state = "D"
-            return 3
-        if self.state == "E":
-            self.state = "C"
-            return 7
-        if self.state == "G":
-            self.state = "D"
-            return 9
-        raise MealyError("pull")
+    pairs = "..LEXEGEZACEBISO" \
+            "USESARMAINDIREA." \
+            "ERATENBERALAVETI" \
+            "EDORQUANTEISRION"
 
 
-class MealyError(Exception):
-    pass
+    class SeedType:
+        def __init__(self, w0, w1, w2):
+            self.w0 = w0
+            self.w1 = w1
+            self.w2 = w2
 
 
-def main():
-    return StateMachine()
+    class FastSeedType:
+        def __init__(self, a, b, c, d):
+            self.a = a
+            self.b = b
+            self.c = c
+            self.d = d
 
 
-def raises(method, error):
-    output = None
-    try:
-        output = method()
-    except Exception as e:
-        assert type(e) == error
-    assert output is None
+    class PlanSys:
+        def __init__(self):
+            self.x = 0
+            self.y = 0
+            self.economy = 0
+            self.govtype = 0
+            self.techlev = 0
+            self.population = 0
+            self.productivity = 0
+            self.radius = 0
+            self.goatsoupseed = FastSeedType(0, 0, 0, 0)
+            self.name = ""
 
 
-def test():
-    o = main()
-    assert o.sway() == 0
-    assert o.sway() == 1
-    assert o.sway() == 4
-    assert o.pull() == 3
-    assert o.sway() == 5
-    assert o.sway() == 6
-    assert o.sway() == 8
-    assert o.pull() == 9
-    assert o.sway() == 5
-    assert o.pull() == 7
-    o = main()
-    assert o.sway() == 0
-    assert o.pull() == 2
-    o = main()
-    raises(lambda: o.pull(), MealyError)
-    assert o.sway() == 0
-    assert o.pull() == 2
-    raises(lambda: o.sway(), MealyError)
+    def tweakseed(s):
+        temp = s.w0 + s.w1 + s.w2
+        s.w0 = s.w1
+        s.w1 = s.w2
+        s.w2 = temp
+
+
+    def makesystem(s):
+        thissys = PlanSys()
+        longnameflag = s.w0 & 64
+
+        thissys.x = (s.w1 >> 8) % 2 ** 32
+        thissys.y = (s.w0 >> 8) % 2 ** 32
+
+        thissys.govtype = (s.w1 >> 3) & 7
+
+        thissys.economy = (s.w0 >> 8) & 7
+        if thissys.govtype <= 1:
+            thissys.economy |= 2
+
+        thissys.techlev = ((s.w1 >> 8) & 3) + (thissys.economy ^ 7)
+        thissys.techlev += thissys.govtype >> 1
+        if thissys.govtype & 1 == 1:
+            thissys.techlev += 1
+
+        thissys.population = 4 * thissys.techlev + thissys.economy
+        thissys.population += thissys.govtype + 1
+
+        thissys.productivity = (thissys.economy ^ 7 + 3) * (thissys.govtype + 4)
+        thissys.productivity *= thissys.population * 8
+
+        thissys.radius = 256 * (((s.w2 >> 8) & 15) + 11) + thissys.x
+
+        thissys.goatsoupseed.a = s.w1 & 0xFF
+        thissys.goatsoupseed.b = s.w1 >> 8
+        thissys.goatsoupseed.c = s.w2 & 0xFF
+        thissys.goatsoupseed.d = s.w2 >> 8
+
+        pair1 = 2 * ((s.w2 >> 8) & 31)
+        tweakseed(s)
+        pair2 = 2 * ((s.w2 >> 8) & 31)
+        tweakseed(s)
+        pair3 = 2 * ((s.w2 >> 8) & 31)
+        tweakseed(s)
+        pair4 = 2 * ((s.w2 >> 8) & 31)
+        tweakseed(s)
+
+        thissys.name = pairs[pair1:pair1 + 2] + pairs[pair2:pair2 + 2] + pairs[pair3:pair3 + 2]
+        if longnameflag:
+            thissys.name += pairs[pair4:pair4 + 2]
+        thissys.name = thissys.name.replace(".", "")
+
+        return thissys
+
+
+    def normalize(values):
+        min_value = min(values)
+        max_value = max(values)
+        normalized_values = [(v - min_value) / (max_value - min_value) for v in values]
+        scaled_values = [(v * 256) for v in normalized_values]
+
+        return scaled_values
+
+
+    seed = SeedType(0x5A4A, 0x0248, 0xB753)
+    systems = [makesystem(seed) for i in range(256)]
+    xs, ys = zip(*((system.x, system.y) for system in systems))
+    xs = normalize(xs)
+    ys = normalize(ys)
+    names = [system.name for system in systems]
+
+    fig, ax = plt.subplots()
+    fig.set_size_inches(32, 16)
+    ax.scatter(xs, ys, color='white', s=2)
+    ax.set_facecolor("black")
+
+    for i, name in enumerate(names):
+        ax.annotate(name, (xs[i], ys[i]),
+                    xytext=(xs[i] + 0.05, ys[i] + 0.05),
+                    color='lightblue',
+                    fontsize=12,
+                    fontname='Times New Roman')
+
+    plt.show()
